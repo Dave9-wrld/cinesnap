@@ -1,40 +1,63 @@
-import React from 'react'
+'use client'
+import React, { useEffect } from 'react'
 
-const TrailerModal = ({trailerKey, movieTitle, onClose}) => {
-    if (!trailerKey) return null;
+const TrailerModal = ({ trailerKey, movieTitle, onClose }) => {
+  // Prevent body scroll while modal open
+  useEffect(() => {
+    if (trailerKey) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [trailerKey]);
+
+  if (!trailerKey) return null;
+
   return (
-    <div 
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-        onClick={onClose}
+    <div
+      className="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Trailer for ${movieTitle}`}
     >
-        <div 
-            className="bg-zinc-900 rounded-2xl overflow-hidden max-w-3xl w-full relative shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-        >
-            <button 
-                onClick={onClose}
-                className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-black/60 hover:bg-red-600 text-white rounded-full transition-colors"
-            >
-                ✕
-            </button>
+      {/* Backdrop click to close */}
+      <div
+        className="modal-backdrop"
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-            <h2 className="text-white font-semibold text-lg p-4 pr-12 border-b border-zinc-800 ">
-                {movieTitle} — Official Preview
-            </h2>
-
-            <div className="aspect-video w-full">
-                <iframe 
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`} 
-                    title={`${movieTitle} Trailer`} 
-                    allow="autoplay; encrypted-media" 
-                    frameBorder="0"
-                    allowFullScreen
-                ></iframe>
-            </div>
+      <div className="modal-container">
+        {/* Header */}
+        <div className="modal-header">
+          <div className="modal-header-icon" aria-hidden="true">🎬</div>
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div className="modal-title">{movieTitle}</div>
+            <div className="modal-sub">Official Trailer Preview</div>
+          </div>
+          <button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Close trailer"
+            title="Close (Esc)"
+          >
+            ✕
+          </button>
         </div>
+
+        {/* Video */}
+        <div className="modal-video">
+          <iframe
+            src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&rel=0&modestbranding=1`}
+            title={`${movieTitle} Official Trailer`}
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
 export default TrailerModal
